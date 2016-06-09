@@ -14,7 +14,7 @@ require "sprockets/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 Dotenv::Railtie.load
-HOSTNAME = ENV['HOSTNAME']
+SECRET_KEY = ENV['INSTAGRAM_KEY']
 
 module Pixlee
   class Application < Rails::Application
