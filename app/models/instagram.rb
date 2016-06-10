@@ -32,18 +32,19 @@ class Instagram
 	end
 
 	def create_posts
-		@parsed_data['data'].each do |post|
-			@current_post = Post.find_by(instagram_id: post['id']) 
-			if !@current_post
-				@current_post = Post.create(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])
-			end
-			check_tag_associations(post)
+		@parsed_data['data'].each do |post| 
+			@current_post = Post.find_by(instagram_id: post['id']) || Post.create(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])
+			create_or_update_tag_associations(post)
+			# check_tag_time(post)
 		end
 	end
 
-	def check_tag_associations(post)
+	def create_or_update_tag_associations(post)
 		if !@current_post.tags.include?(@collection.tag)
 			tagged_post = PostTag.new(post_id: @current_post.id, tag_id: @collection.tag.id)
+			tagged_post.tag_time = get_tag_time(post)
+			tagged_post.save if !tagged_post.persisted?
+		elsif @current_post.tagged_posts.find_by(tag_id: @collection.tag).tag_time == nil
 			tagged_post.tag_time = get_tag_time(post)
 			tagged_post.save if !tagged_post.persisted?
 		end
@@ -59,7 +60,7 @@ class Instagram
 	end
 
 	def process_next_page
-		return @parsed_data = InstApi::POSTS.posts(@hashtag, @start_date, @end_date, "&max_tag_id=#{@parsed_data['pagination']['next_max_tag_id']}")
+		@parsed_data = InstApi::POSTS.posts(@hashtag, @start_date, @end_date, "&max_tag_id=#{@parsed_data['pagination']['next_max_tag_id']}")
 	end
 
 	def pagination_is_done?
