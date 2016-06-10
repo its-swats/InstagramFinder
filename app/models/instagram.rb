@@ -3,16 +3,14 @@ class Instagram
 
 	def initialize(hashtag)
 		@hashtag = hashtag
-		@start_date = Date.parse("2016-6-01").to_time.to_i
+		@start_date = Date.parse("2016-6-09").to_time.to_i
 		@end_date = Date.parse("2016-06-12").to_time.to_i
 		@parsed_data = get_data_from_api
-
-
 	end
 
 	def create_instagram_collection
 		create_collection
-		create_posts
+		create_posts until pagination_is_done?
 	end
 
 	private
@@ -34,12 +32,9 @@ class Instagram
 			new_post.tags << @collection.tag
 			new_post.save if !new_post.persisted?
 		end
-
-		handle_pagination if @parsed_data['pagination']['next_url']
 	end
 
-	def handle_pagination
-			@parsed_data = get_data_from_api("&max_tag_id=#{@parsed_data['pagination']['next_max_tag_id']}")
-			create_posts
+	def pagination_is_done?
+		@parsed_data['pagination']['next_max_tag_id'] == nil ? true : (@parsed_data = get_data_from_api("&max_tag_id=#{@parsed_data['pagination']['next_max_tag_id']}"); (return false))
 	end
 end
