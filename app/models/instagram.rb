@@ -4,66 +4,50 @@ class Instagram
 	attr_reader :hashtag, :parsed_data, :start_date, :end_date
 
 	def initialize(hashtag)
-		@hashtag = hashtag
-		@start_date = Date.parse("2016-05-09").to_time.to_i
+		@hashtag = Tag.find_or_create_by(hashtag: hashtag)
+		@start_date = Date.parse("2016-02-10").to_time.to_i
 		@end_date = Date.parse("2016-06-12").to_time.to_i
-		@parsed_data = InstApi::POSTS.posts(@hashtag, @start_date, @end_date)
+		@parsed_data = InstApi::POSTS.posts(hashtag, @start_date, @end_date)
 	end
 
 	def create_instagram_collection
-		create_collection
-		process_paginated_data
+		create_posts
 	end
 
 	private
 
-	def create_collection
-		@collection = Collection.new
-		@collection.tag = Tag.find_or_create_by(hashtag: hashtag)
-		@collection.save if !@collection.persisted?
-	end
-
-	def process_paginated_data
-		loop do
-			create_posts
-			break if pagination_is_done?
-			process_next_page
-		end
-	end
-
 	def create_posts
-		@parsed_data['data'].each do |post| 
-			@current_post = Post.find_by(instagram_id: post['id']) || Post.create(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])
+		parsed_data.each do |post| 
+			@current_post = Post.find_by(instagram_id: post['id']) || 
+				Post.create(
+					file_type: post['type'], 
+					caption: post['caption'], 
+					username: post['user']['username'], 
+					instagram_id: post['id'], 
+					video: post['videos'], 
+					image: post['images']
+				)
 			create_or_update_tag_associations(post)
-			# check_tag_time(post)
 		end
 	end
 
 	def create_or_update_tag_associations(post)
-		if !@current_post.tags.include?(@collection.tag)
-			tagged_post = PostTag.new(post_id: @current_post.id, tag_id: @collection.tag.id)
+		if !@current_post.tags.include?(@hashtag)
+			tagged_post = PostTag.new(post_id: @current_post.id, tag_id: @hashtag.id)
 			tagged_post.tag_time = get_tag_time(post)
 			tagged_post.save if !tagged_post.persisted?
-		elsif @current_post.tagged_posts.find_by(tag_id: @collection.tag).tag_time == nil
+		elsif @current_post.tagged_posts.find_by(id: @hashtag.id).tag_time == nil
 			tagged_post.tag_time = get_tag_time(post)
 			tagged_post.save if !tagged_post.persisted?
 		end
 	end
 
 	def get_tag_time(post)
-		if post['caption'] && post['caption']['text'].downcase.include?('#'+hashtag)
+		if post['caption'] && post['caption']['text'].downcase.include?('#'+@hashtag.hashtag)
 			return post['caption']['created_time'].to_i
 		else
 			comments = InstApi::COMMENTS.comments(post['id'])
-			return comments['data'].find {|x| x['text'].downcase.include?('#'+@hashtag) && x['from']['username'] == post['user']['username']}['created_time']
+			return comments['data'].find {|x| x['text'].downcase.include?('#'+@hashtag.hashtag) && x['from']['username'] == post['user']['username']}['created_time']
 		end
-	end
-
-	def process_next_page
-		@parsed_data = InstApi::POSTS.posts(@hashtag, @start_date, @end_date, "&max_tag_id=#{@parsed_data['pagination']['next_max_tag_id']}")
-	end
-
-	def pagination_is_done?
-		return @parsed_data['pagination']['next_max_tag_id'] == nil
 	end
 end
