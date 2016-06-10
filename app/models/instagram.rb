@@ -1,9 +1,12 @@
 class Instagram
-	attr_reader :hashtag, :parsed_data
+	attr_reader :hashtag, :parsed_data, :start_date, :end_date
 
 	def initialize(hashtag)
 		@hashtag = hashtag
+		@start_date = Date.parse("2016-6-01").to_time.to_i
+		@end_date = Date.parse("2016-06-12").to_time.to_i
 		@parsed_data = get_data_from_api
+
 
 	end
 
@@ -15,7 +18,7 @@ class Instagram
 	private
 
 	def get_data_from_api(pagination = '')
-		JSON.parse(HTTParty.get("https://api.instagram.com/v1/tags/#{@hashtag}/media/recent?access_token=#{SECRET_KEY}#{pagination}").body)
+		JSON.parse(HTTParty.get("https://api.instagram.com/v1/tags/#{@hashtag}/media/recent?access_token=#{SECRET_KEY}&min_timestamp=#{@start_date}&max_timestamp=#{@end_date}#{pagination}").body)
 	end
 
 	def create_collection
