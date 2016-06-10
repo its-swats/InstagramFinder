@@ -1,3 +1,5 @@
+require "InstApi"
+
 class Instagram
 	attr_reader :hashtag, :parsed_data, :start_date, :end_date
 
@@ -5,7 +7,7 @@ class Instagram
 		@hashtag = hashtag
 		@start_date = Date.parse("2016-05-09").to_time.to_i
 		@end_date = Date.parse("2016-06-12").to_time.to_i
-		@parsed_data = get_data_from_api
+		@parsed_data = InstApi::POSTS::posts(@hashtag, SECRET_KEY, @start_date, @end_date)
 	end
 
 	def create_instagram_collection
@@ -17,6 +19,7 @@ class Instagram
 
 	def get_data_from_api(pagination = '')
 		JSON.parse(HTTParty.get("https://api.instagram.com/v1/tags/#{@hashtag}/media/recent?access_token=#{SECRET_KEY}&min_timestamp=#{@start_date}&max_timestamp=#{@end_date}#{pagination}").body)
+			# https://api.instagram.com/v1/media/#{post['id']}/comments?access_token=#{SECRET_KEY}"
 	end
 
 	def create_collection
@@ -29,7 +32,7 @@ class Instagram
 		@parsed_data['data'].each do |post|
 			@current_post = Post.find_by(instagram_id: post['id']) 
 			if !@current_post
-				@current_post = Post.create(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])		
+				@current_post = Post.create(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])
 			end
 			check_tag_associations(post)
 		end
