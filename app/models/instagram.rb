@@ -1,3 +1,5 @@
+require "InstApi"
+
 class Instagram
 	attr_reader :hashtag, :parsed_data, :start_date, :end_date
 
@@ -5,19 +7,15 @@ class Instagram
 		@hashtag = hashtag
 		@start_date = Date.parse("2016-05-09").to_time.to_i
 		@end_date = Date.parse("2016-06-12").to_time.to_i
-		@parsed_data = get_data_from_api
+		@parsed_data = InstApi::POSTS.posts(@hashtag, @start_date, @end_date)
 	end
 
 	def create_instagram_collection
 		create_collection
-		create_posts until pagination_is_done?
+		process_paginated_data
 	end
 
 	private
-
-	def get_data_from_api(pagination = '')
-		JSON.parse(HTTParty.get("https://api.instagram.com/v1/tags/#{@hashtag}/media/recent?access_token=#{SECRET_KEY}&min_timestamp=#{@start_date}&max_timestamp=#{@end_date}#{pagination}").body)
-	end
 
 	def create_collection
 		@collection = Collection.new
@@ -25,11 +23,19 @@ class Instagram
 		@collection.save if !@collection.persisted?
 	end
 
+	def process_paginated_data
+		loop do
+			create_posts
+			break if pagination_is_done?
+			process_next_page
+		end
+	end
+
 	def create_posts
 		@parsed_data['data'].each do |post|
 			@current_post = Post.find_by(instagram_id: post['id']) 
 			if !@current_post
-				@current_post = Post.create(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])		
+				@current_post = Post.create(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])
 			end
 			check_tag_associations(post)
 		end
@@ -47,12 +53,16 @@ class Instagram
 		if post['caption'] && post['caption']['text'].downcase.include?('#'+hashtag)
 			return post['caption']['created_time'].to_i
 		else
-			comments = JSON.parse(HTTParty.get("https://api.instagram.com/v1/media/#{post['id']}/comments?access_token=#{SECRET_KEY}").body)
-			byebug
+			comments = InstApi::COMMENTS.comments(post['id'])
+			return comments['data'].find {|x| x['text'].downcase.include?('#'+@hashtag) && x['from']['username'] == post['user']['username']}['created_time']
 		end
 	end
 
+	def process_next_page
+		return @parsed_data = InstApi::POSTS.posts(@hashtag, @start_date, @end_date, "&max_tag_id=#{@parsed_data['pagination']['next_max_tag_id']}")
+	end
+
 	def pagination_is_done?
-		@parsed_data['pagination']['next_max_tag_id'] == nil ? true : (@parsed_data = get_data_from_api("&max_tag_id=#{@parsed_data['pagination']['next_max_tag_id']}"); (return false))
+		return @parsed_data['pagination']['next_max_tag_id'] == nil
 	end
 end
