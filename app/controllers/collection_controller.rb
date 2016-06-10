@@ -3,7 +3,7 @@ class InstagramController < ApplicationController
 
 	def index
 		# @response = HTTParty.get("https://api.instagram.com/v1/tags/#{params[:request][:hashtag]}/media/recent?access_token=#{SECRET_KEY}")
-		@response = JSON.parse(HTTParty.get("https://api.instagram.com/v1/tags/#{params[:request][:hashtag]}/media/recent?access_token=#{SECRET_KEY}").body)['data']
+		
 	end
 
 	def show
@@ -11,7 +11,8 @@ class InstagramController < ApplicationController
 	end
 
 	def create
-
+		Instagram.new(params[:request][:hashtag])
+		# @response = 
 	end
 
 	def delete
