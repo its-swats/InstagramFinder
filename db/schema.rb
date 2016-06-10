@@ -41,8 +41,8 @@ ActiveRecord::Schema.define(version: 20160609222137) do
     t.string   "file_type"
     t.string   "caption"
     t.string   "username"
-    t.string   "image_url"
-    t.string   "video_url"
+    t.string   "image"
+    t.string   "video"
     t.string   "instagram_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false

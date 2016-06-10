@@ -4,8 +4,8 @@ class CreatePosts < ActiveRecord::Migration
     	t.string :file_type
     	t.string :caption
     	t.string :username
-    	t.string :image_url
-      t.string :video_url
+    	t.string :image
+      t.string :video
     	t.string :instagram_id
 
       t.timestamps null: false
