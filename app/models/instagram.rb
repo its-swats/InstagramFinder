@@ -3,7 +3,7 @@ class Instagram
 
 	def initialize(hashtag)
 		@hashtag = hashtag
-		@start_date = Date.parse("2016-6-09").to_time.to_i
+		@start_date = Date.parse("2016-05-09").to_time.to_i
 		@end_date = Date.parse("2016-06-12").to_time.to_i
 		@parsed_data = get_data_from_api
 	end
@@ -27,10 +27,28 @@ class Instagram
 
 	def create_posts
 		@parsed_data['data'].each do |post|
-			new_post = Post.find_by(instagram_id: post['id']) || Post.new(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])		
-			new_post.collections << @collection
-			new_post.tags << @collection.tag
-			new_post.save if !new_post.persisted?
+			@current_post = Post.find_by(instagram_id: post['id']) 
+			if !@current_post
+				@current_post = Post.create(file_type: post['type'], caption: post['caption'], username: post['user']['username'], instagram_id: post['id'], video: post['videos'], image: post['images'])		
+			end
+			check_tag_associations(post)
+		end
+	end
+
+	def check_tag_associations(post)
+		if !@current_post.tags.include?(@collection.tag)
+			tagged_post = PostTag.new(post_id: @current_post.id, tag_id: @collection.tag.id)
+			tagged_post.tag_time = get_tag_time(post)
+			tagged_post.save if !tagged_post.persisted?
+		end
+	end
+
+	def get_tag_time(post)
+		if post['caption'] && post['caption']['text'].downcase.include?('#'+hashtag)
+			return post['caption']['created_time'].to_i
+		else
+			comments = JSON.parse(HTTParty.get("https://api.instagram.com/v1/media/#{post['id']}/comments?access_token=#{SECRET_KEY}").body)
+			byebug
 		end
 	end
 
