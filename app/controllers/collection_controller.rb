@@ -1,10 +1,9 @@
 class CollectionController < ApplicationController
 	# require 'httparty'
+	protect_from_forgery
 
 	def index
 		p params
-		# @response = HTTParty.get("https://api.instagram.com/v1/tags/#{params[:request][:hashtag]}/media/recent?access_token=#{SECRET_KEY}")
-		# {"request"=>{"hashtag"=>"", "start_date"=>"2016-06-07", "end_date"=>"2016-06-22"}, "controller"=>"collection", "action"=>"index"}
 	end
 
 	def show
@@ -12,8 +11,9 @@ class CollectionController < ApplicationController
 	end
 
 	def create
-		Instagram.new(params[:request][:hashtag])
-		# @response = 
+		test = Instagram.new(params[:request][:hashtag], params[:request][:start_date], params[:request][:end_date])
+		test.create_instagram_collection
+		redirect_to root_path
 	end
 
 	def delete

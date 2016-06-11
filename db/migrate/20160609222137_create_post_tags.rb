@@ -4,6 +4,7 @@ class CreatePostTags < ActiveRecord::Migration
     	t.integer :post_id
     	t.integer :tag_id
     	t.integer :tag_time
+    	t.string :pointer
 
       t.timestamps null: false
     end
