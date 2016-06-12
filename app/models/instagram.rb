@@ -6,9 +6,7 @@ class Instagram
 	def initialize(hashtag, start_date, end_date)
 		@hashtag = Tag.find_or_create_by(hashtag: hashtag)
 		@start_date = Date.parse(start_date).to_time.to_i
-		@end_date = Date.parse(end_date).to_time.to_i
-		# @start_date = Date.parse("2016-03-01").to_time.to_i
-		# @end_date = Date.parse("2016-05-25").to_time.to_i
+		@end_date = (Date.parse(end_date).to_time.to_i + 86400)
 		@parsed_data = InstApi::POSTS.posts(hashtag, @start_date, @end_date, closest_start)
 	end
 
@@ -19,9 +17,8 @@ class Instagram
 	private
 
 	def closest_start
-		closest = PostTag.where("tag_time > ?", end_date).order(tag_time: :asc).first
-		p closest
-		return closest.pointer if closest
+		closest = @hashtag.tagged_posts.where("tag_time > ?", end_date).order(tag_time: :asc).first
+		return ("&max_tag_id=#{closest.pointer}") if closest
 		return nil
 	end
 
@@ -57,7 +54,9 @@ class Instagram
 			return post['caption']['created_time'].to_i
 		else
 			comments = InstApi::COMMENTS.comments(post['id'])
-			return comments['data'].find {|x| x['text'].downcase.include?('#'+@hashtag.hashtag) && x['from']['username'] == post['user']['username']}['created_time']
+			if !comments['data'].empty?
+				return comments['data'].find {|x| x['text'].downcase.include?('#'+@hashtag.hashtag) && x['from']['username'] == post['user']['username']}['created_time'] 
+			end
 		end
 	end
 end
