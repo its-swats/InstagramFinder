@@ -18,45 +18,54 @@ class Instagram
 
 	def closest_start
 		closest = @hashtag.tagged_posts.where("tag_time > ?", end_date).order(tag_time: :asc).first
-		return ("&max_tag_id=#{closest.pointer}") if closest
+		return closest.pointer if closest
 		return nil
 	end
 
 	def create_posts
 		parsed_data.each do |post| 
-			@current_post = Post.find_by(instagram_id: post['id']) || 
-				Post.create(
+			@tagged_post = PostTag.new(tag_id: @hashtag.id)
+			@tagged_post.tag_time = get_tag_time(post)
+			if within_time_range
+				@current_post = Post.find_by(instagram_id: post['id']) || 
+				Post.new(
 					file_type: post['type'], 
 					caption: post['caption'], 
 					username: post['user']['username'], 
 					instagram_id: post['id'], 
 					video: post['videos'], 
 					image: post['images']
-				)
-			create_or_update_tag_associations(post)
+					)
+				create_or_update_tag_associations(post)
+			end
 		end
 	end
 
 	def create_or_update_tag_associations(post)
 		if !@current_post.tags.include?(@hashtag)
-			tagged_post = PostTag.new(post_id: @current_post.id, tag_id: @hashtag.id)
-			tagged_post.tag_time = get_tag_time(post)
-			tagged_post.pointer = post['pointer']
-			tagged_post.save
-		elsif @current_post.tagged_posts.find_by(tag_id: @hashtag.id).tag_time == nil
-			tagged_post.tag_time = get_tag_time(post)
-			tagged_post.save if !tagged_post.persisted?
-		end
+			@tagged_post.pointer = post['pointer']
+			@current_post.save				
+			@tagged_post.post_id = @current_post.id
+			@tagged_post.save
+		end				
+	end
+
+	def tagged_in_caption(post)
+		return post['caption'] && post['caption']['text'].downcase.include?('#'+@hashtag.hashtag)
 	end
 
 	def get_tag_time(post)
-		if post['caption'] && post['caption']['text'].downcase.include?('#'+@hashtag.hashtag)
+		if tagged_in_caption(post)
 			return post['caption']['created_time'].to_i
 		else
 			comments = InstApi::COMMENTS.comments(post['id'])
-			if !comments['data'].empty?
-				return comments['data'].find {|x| x['text'].downcase.include?('#'+@hashtag.hashtag) && x['from']['username'] == post['user']['username']}['created_time'] 
-			end
+			matches = comments['data'].find {|comment| comment['from']['username'] == post['user']['username'] && comment['text'].downcase.include?('#'+@hashtag.hashtag)}
+			matches ? (return matches['created_time']) : nil
 		end
 	end
+
+	def within_time_range
+		return @tagged_post.tag_time < @end_date && @tagged_post.tag_time > @start_date if @tagged_post.tag_time
+	end
+
 end

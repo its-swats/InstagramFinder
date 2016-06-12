@@ -1,20 +1,7 @@
-<form id='instagram-scrape-form' action='/collection' method='post'>
-	<h1>Populate Our Database</h1>
-	<input type='text' name='request[hashtag]' />
-	<input type='date' name='request[start_date]' />
-	<input type='date' name='request[end_date]' />
-	<input type='submit'>
-</form> 
-
-<form id='local-get-form' action='/collection' method='get'>
-	<h1>Check Our Local Database</h1>
-	<input type='text' name='request[hashtag]' />
-	<input type='date' name='request[start_date]' />
-	<input type='date' name='request[end_date]' />
-	<input type='submit'>
-</form>
 
 
+<%= render '/form', caption: 'Scrape Instagram', method: 'post'  %>
+<%= render '/form', caption: 'Search Locally', method: 'get'  %>
 
 <% if @data %>
 	<% @data.each do |tag| %>
