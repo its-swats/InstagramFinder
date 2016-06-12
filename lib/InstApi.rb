@@ -23,8 +23,6 @@ module InstApi
         next_page = "#{NEXT_PAGE}#{new_posts.parsed_response['pagination']['next_max_tag_id']}"
         break if pagination_is_done?(new_posts, start_date)
       end
-      # byebug
-      # return trim_dates(all_posts.flatten(1), start_date, end_date)
       return all_posts.flatten(1)
     end
 
