@@ -1,0 +1,17 @@
+<form id='instagram-scrape-form' action='/collection' method='<%=method%>'>
+	<h1><%=caption%></h1>
+	<h5><%=explanation%></h5>
+	<div class='form-group'>
+		<label for='request[hashtag]'>Hashtag</label>
+		<input class='form-control' type='text' placeholder='Enter a hashtag here...' name='request[hashtag]' />
+	</div>
+	<div class='form-group'>
+		<label for='request[start_date]'>Start Date</label>
+		<input class='form-control' type='date' name='request[start_date]' />
+	</div>
+	<div class='form-group'>
+		<label for='request[end_date]'>End Date</label>
+		<input class='form-control' type='date' name='request[end_date]' />
+	</div>
+	<input type='submit' class='btn btn-primary btn-block btn-lg'>
+</form>

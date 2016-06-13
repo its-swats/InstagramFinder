@@ -1,8 +1,0 @@
-<h1> Test page </h1>
-<%if @response %>
-	<% @response.each do |post| %>
-		<% if post['type'] == 'image' %>
-			<p>User: <%= post['user']['username']%></p>
-		<% end %>
-	<% end %>
-<% end %>

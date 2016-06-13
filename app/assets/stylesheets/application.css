@@ -13,3 +13,13 @@
  *= require_tree .
  *= require_self
  */
+
+
+nav {
+	margin-bottom: 1em;
+}
+
+.carousel-item img {
+	margin: auto;
+}
+

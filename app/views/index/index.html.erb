@@ -1,6 +1,27 @@
-<form id='instagram-form' action='/collection'>
-	<input type='text' name='request[hashtag]' />
-	<input type='date' name='request[start_date]' />
-	<input type='date' name='request[end_date]' />
-	<input type='submit'>
-</form> 
+<div class='row'>
+	<div class='col-xs-6 col-md-2'>
+		<% if @data %>
+			<h2>Recent Scrapes</h2>
+			<% @data.each do |tag| %>
+			<ul>
+				<li><a href='#' class='sidebar-link'>#<%=tag.hashtag%></a></li>
+				<li><%=tag.tagged_posts.count%> entries</li>
+			</ul>
+			<% end %>
+		<% end %>
+	</div>
+	<div class='col-xs-12 col-md-8'>
+		<div class='card'>
+			<div class='card-block'>
+				<div id='scrape' class='initial-form'>
+					<%= render '/form', caption: 'Scrape Instagram', explanation: 
+							'Hit the Instagram API and load up a local server with posts.', method: 'post'  %>
+				</div>
+				<div id='retrieve' class='initial-form'>
+					<%= render '/form', caption: 'Search Locally', explanation: 
+							'Search the local database of scraped posts, no API hits needed!', method: 'get'  %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

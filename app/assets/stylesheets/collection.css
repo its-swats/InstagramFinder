@@ -1,0 +1,23 @@
+.carousel-control.left, .carousel-control.right {
+  background: none;
+  filter: progid: none;
+  filter:none;
+  background-image:none;
+  outline: 0;
+  opacity: 1;
+ }
+
+ .carousel-control.left {
+ 	color: black;
+ 	left: -15%;
+ }
+
+ .carousel-control.right {
+ 	color: black;
+ 	left: 100%;
+ }
+
+ .carousel-caption h5{
+ 	-webkit-text-stroke-width: .25px;
+ 	-webkit-text-stroke-color: black;
+}
