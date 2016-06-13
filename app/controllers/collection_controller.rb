@@ -10,12 +10,15 @@ class CollectionController < ApplicationController
 																 .where("tag_time > ?", Date.parse(params[:request][:start_date]).to_time.to_i)
 			@cover = @all_posts[0]
 			@pages = @all_posts[1..-1]
+			status 200
 			if @cover == nil
 				flash[:errors] = "No entries for #{@hashtag.hashtag} found - please scrape first."
+				status 400
 				redirect_to root_path
 			end
 		else
 			flash[:errors] = "Your search terms were not valid, please try again."
+			status 400
 			redirect_to root_path
 		end
 	end
@@ -25,9 +28,11 @@ class CollectionController < ApplicationController
 			collection = Instagram.new(params[:request][:hashtag].gsub(/[^0-9a-z]/i, ''), 
 																 params[:request][:start_date], params[:request][:end_date])
 			collection.create_instagram_collection
+			status 200
 			redirect_to root_path
 		else
 			flash[:errors] = "Your search terms were not valid, please try again."
+			status 400
 			redirect_to root_path
 		end
 	end

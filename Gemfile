@@ -38,6 +38,7 @@ group :development, :test do
   gem 'byebug'
   gem 'rspec-rails'
   gem 'dotenv-rails'
+  gem 'database_cleaner'
 end
 
 group :production do
