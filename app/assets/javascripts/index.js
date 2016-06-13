@@ -2,6 +2,7 @@ $(document).ready(function() {
 	preparePage();
 	toggleSearch();
 	verifyForm();
+	sidebarClick();
 })
 
 function preparePage(){
@@ -28,7 +29,7 @@ function toggleSearch(){
 			$('.initial-form:nth-child(2)').hide();
 		};
 	});
-}
+};
 
 function verifyForm(){
 	$('form').change(function(e){
@@ -38,15 +39,23 @@ function verifyForm(){
 			$(e.target).parent().parent().find('input:submit').prop('disabled', true);
 		};
 	});
-}
+};
 
 function verifyHashtag(e){
-	return !!$(e.target).parent().parent().find("input[name='request[hashtag]']").val()
-}
+	return !!$(e.target).parent().parent().find("input[name='request[hashtag]']").val();
+};
 
 function verifyDate(e){
-	var start_date = Date.parse($(e.target).parent().parent().find("input[name='request[start_date]']").val())
-	var end_date = Date.parse($(e.target).parent().parent().find("input[name='request[end_date]']").val())
-	var current_date = Date.now()
+	var start_date = Date.parse($(e.target).parent().parent().find("input[name='request[start_date]']").val());
+	var end_date = Date.parse($(e.target).parent().parent().find("input[name='request[end_date]']").val());
+	var current_date = Date.now();
 	return end_date <= current_date && start_date <= end_date
-}
+};
+
+function sidebarClick() {
+	$('.sidebar-link').on('click', function(event){
+		event.preventDefault();
+		var clickedLink = $(this).text();
+		$("input[name='request[hashtag]'").val(clickedLink); 
+	});
+};

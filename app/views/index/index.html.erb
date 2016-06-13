@@ -4,7 +4,7 @@
 			<h2>Recent Scrapes</h2>
 			<% @data.each do |tag| %>
 			<ul>
-				<li>#<%=tag.hashtag%></li>
+				<li><a href='#' class='sidebar-link'>#<%=tag.hashtag%></a></li>
 				<li><%=tag.tagged_posts.count%> entries</li>
 			</ul>
 			<% end %>
@@ -14,10 +14,12 @@
 		<div class='card'>
 			<div class='card-block'>
 				<div id='scrape' class='initial-form'>
-					<%= render '/form', caption: 'Scrape Instagram', method: 'post'  %>
+					<%= render '/form', caption: 'Scrape Instagram', explanation: 
+							'Hit the Instagram API and load up a local server with posts.', method: 'post'  %>
 				</div>
 				<div id='retrieve' class='initial-form'>
-					<%= render '/form', caption: 'Search Locally', method: 'get'  %>
+					<%= render '/form', caption: 'Search Locally', explanation: 
+							'Search the local database of scraped posts, no API hits needed!', method: 'get'  %>
 				</div>
 			</div>
 		</div>
