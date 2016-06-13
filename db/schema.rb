@@ -27,10 +27,10 @@ ActiveRecord::Schema.define(version: 20160609222137) do
 
   create_table "posts", force: :cascade do |t|
     t.string   "file_type"
-    t.string   "caption"
+    t.text     "caption"
     t.string   "username"
-    t.string   "image"
-    t.string   "video"
+    t.text     "image"
+    t.text     "video"
     t.string   "instagram_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
