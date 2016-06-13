@@ -8,14 +8,15 @@
 				  	<div class='carousel-item active'>
 				  		<a href="<%=@cover.image['standard_resolution']['url']%>" target="_blank"><img class='img-fluid' src="<%=@cover.image['standard_resolution']['url']%>"></img></a>
 				  		<div class='carousel-caption'>
-				      	<h5><%=@cover.caption['text']%></h5>
+
+				      	<h5><%=@cover.caption['text'] if @cover.caption%></h5>
 				      </div>
 				  	</div>
 				    <% @pages.each do |post| %>
 				   	<div class="carousel-item">
 				      <a href="<%=post.image['standard_resolution']['url']%>"><img class='img-fluid' src="<%=post.image['standard_resolution']['url']%>" target="_blank"></img></a>
 				      <div class='carousel-caption'>
-				      	<h5><%=post.caption['text']%></h5>
+				      	<h5><%=post.caption['text'] if post.caption%></h5>
 				      </div>
 				    </div>
 				    <% end %>
