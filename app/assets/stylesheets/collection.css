@@ -1,8 +1,6 @@
 .carousel-control.left, .carousel-control.right {
   background: none;
-  filter: progid: none;
-  filter:none;
-  background-image:none;
+  background-image: none;
   outline: 0;
   opacity: 1;
  }
@@ -18,6 +16,15 @@
  }
 
  .carousel-caption h5{
- 	-webkit-text-stroke-width: .25px;
- 	-webkit-text-stroke-color: black;
+ 	color: black
+}
+
+.carousel-item img {
+	margin: auto;
+}
+
+.carousel-caption {
+    position: relative;
+    left: auto;
+    right: auto;
 }
