@@ -1,6 +1,6 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'ErrorHandling'
-require 'Date' 
+# require 'Date' 
 
 describe ErrorHandling do 
 	let (:valid_params) { {start_date: "2016-06-01", end_date: "2016-06-07", hashtag: 'gameofthrones'}} 
