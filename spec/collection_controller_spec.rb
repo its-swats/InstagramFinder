@@ -15,13 +15,21 @@ RSpec.describe CollectionController, type: :controller do
 			get :index, request: valid_params
 			expect(response.status).to eq(200)
 		end
-		it 'returns 204 when there is no data to return' do 
+		it 'redirects to index with a 302 when no posts are found' do 
 			get :index, request: valid_params_without_posts
-			expect(response.status).to eq(204)
+			expect(response.status).to eq(302)
 		end
-		it 'returns 400 when the search terms are invalid' do
+		it 'redirects to index with a 302 on invalid params' do
 			get :index, request: invalid_params
-			expect(response.status).to eq(400)
+			expect(response.status).to eq(302)
+		end
+		it 'populates flash with an error message on invalid terms' do
+			get :index, request: invalid_params
+			expect(flash[:errors]).to eq("Your search terms were not valid, please try again.")
+		end
+		it 'populates flash with an error message when no posts exist for search term' do
+			get :index, request: valid_params_without_posts
+			expect(flash[:errors]).to eq("No entries for bicycle found - please scrape first.")
 		end
 	end
 
@@ -34,11 +42,15 @@ RSpec.describe CollectionController, type: :controller do
 		end
 		it 'returns 200 on successful creation' do
 			post :create, request: valid_params
-			expect(response.status).to eq(200)
+			expect(response.status).to eq(302)
 		end
-		it 'returns 400 on invalid params' do
+		it 'redirects to index with a 302 on on invalid params' do
 			post :create, request: invalid_params
-			expect(response.status).to eq(400)
+			expect(response.status).to eq(302)
+		end
+		it 'populates flash errors with an error message when params are invalid' do 
+			post :create, request: invalid_params
+			expect(flash[:errors]).to eq("Your search terms were not valid, please try again.")
 		end
 	end
 end
