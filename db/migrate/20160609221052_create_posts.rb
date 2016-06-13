@@ -7,7 +7,7 @@ class CreatePosts < ActiveRecord::Migration
     	t.text :image
       t.text :video
     	t.string :instagram_id
-
+      t.string :link
       t.timestamps null: false
     end
   end

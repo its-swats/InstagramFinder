@@ -34,7 +34,8 @@ class Instagram
 					username: post['user']['username'], 
 					instagram_id: post['id'], 
 					video: post['videos'], 
-					image: post['images']
+					image: post['images'],
+					link: post['link']
 					)
 				create_or_update_tag_associations(post)
 			end

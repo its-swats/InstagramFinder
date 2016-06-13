@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 20160609222137) do
     t.text     "image"
     t.text     "video"
     t.string   "instagram_id"
+    t.string   "link"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
   end
